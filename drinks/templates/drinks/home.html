@@ -1,0 +1,69 @@
+{% extends "drinks/base.html" %}
+
+{% block content %}
+    {% if drink %}
+        {% if user.is_authenticated %}
+            <h1 class="mb-4">The Drink of the Day!</h1>
+        {% else %}
+            <h1 class="mb-4">Try this drink!</h1>
+        {% endif %}
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <text class="mr-2">{{ drink.Type }}</text>
+                    <small class="text-muted">
+                        {% if drink.Alcohol %}
+                            Alcohol
+                        {% else %}
+                            Non-Alcohol
+                        {% endif %}
+                    </small>
+                    {% if user.is_superuser %}
+                        <div class="float-right">
+                            <a class="ml-1" href="{% url 'drink-update' drink.id %}">Update</a>
+                            <a class="ml-1" href="{% url 'drink-delete' drink.id %}">Delete</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <h2 class ="mb-4">{{ drink.Name }}</h2>
+                {% if recipe %}
+                    <h4 class="mt-4"><u>Ingredients</u>
+                        {% if user.is_superuser %}
+                            <div class="float-right">
+                                <a href="{% url 'recipe-create' drink_id=drink.id %}">Add Item</a>
+                            </div>
+                        {% endif %}
+                    </h4>
+                    {% for ingredient in recipe %}
+                        <h5>
+                            {{ ingredient.Quantity }}
+                            {{ ingredient.Measurement }}
+                            {{ ingredient.Ingredient }}
+                            {% if user.is_superuser %}
+                                <div class="float-right">
+                                    <a class="ml-1" href="{% url 'recipe-update' pk=ingredient.id drink_id=drink.id %}">Update</a>
+                                    <a class="ml-1" href="{% url 'recipe-delete' pk=ingredient.id drink_id=drink.id %}">Delete</a>
+                                </div>
+                            {% endif %}
+                        </h5>
+                    {% endfor %}
+                {% else %}
+                    <h5 class="mt-4">
+                        No recipe is available for this drink.
+                        {% if user.is_superuser %}
+                            <div class="float-right">
+                                <a href="{% url 'recipe-create' drink_id=drink.id %}">Add Item</a>
+                            </div>
+                        {% endif %}
+                    </h5> 
+                {% endif %}
+            </div>
+        </article>
+        {% if not user.is_authenticated %}
+            <h5 class="mb-4">Register and log in to access more recipes!</h1>
+        {% endif %}
+    {% else %}
+        <h1>No drinks are available at this time. Come back later!</h1>
+    {% endif %}
+{% endblock content %}
+

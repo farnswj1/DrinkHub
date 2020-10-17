@@ -1,0 +1,8 @@
+{% extends "drinks/base.html" %}
+
+{% block content %}
+    <h2>You have logged out!</h2>
+    <small class="text-muted">
+        <a class="lm-2" href="{% url 'login' %}">Log back in!</a>
+    </small>
+{% endblock content %}

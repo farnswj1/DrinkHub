@@ -1,0 +1,40 @@
+{% extends "drinks/base.html" %}
+
+{% block content %}
+    {% if user_profile %}
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <text class="mr-2">
+                        {% if not user_profile.is_active %}
+                            Deleted
+                        {% elif user_profile.is_superuser %}
+                            Administrator
+                        {% elif user_profile.is_staff %}
+                            Staff
+                        {% else %}
+                            User
+                        {% endif %}
+                    </text>
+                    {% if user.is_superuser and user_profile.is_active %}
+                        <div class="float-right">
+                            <a class="ml-1" href="{% url 'user-delete' user_profile.id %}">Delete</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="media mt-3">
+                    <img class="rounded-circle account-img" src="{{ user_profile.profile.image.url }}">
+                    <div class="media-body">
+                        <h2 class="account-heading">
+                            {{ user_profile.username }}
+                        </h2>
+                        <p class="text-secondary">{{ user_profile.email }}</p>
+                    </div>
+                </div>
+            </div>
+        </article>
+    {% else %}
+        <h1>The user you are looking for does not exist.</h1>
+    {% endif %}
+    <a class="btn btn-outline-secondary" href="{% url 'users-list' %}">Back</a>
+{% endblock content %}

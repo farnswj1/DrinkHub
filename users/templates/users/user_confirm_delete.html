@@ -1,0 +1,29 @@
+{% extends "drinks/base.html" %}
+
+{% block content %}
+    {% if user.is_authenticated %}
+        <div class="content-section">
+            <form method="POST">
+                {% csrf_token %}
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">Delete User Account</legend>
+                    {% if user.id == user_id %}
+                        <h3>Are you sure you want to delete your account?</h3>
+                    {% else %}
+                        <h3>Are you sure you want to delete {{ object }}'s account?</h3>
+                    {% endif %}
+                </fieldset>
+                <div class="form-group">
+                    <button class="btn btn-outline-danger" type="submit">Delete</button>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <h1 class="mb-4">You are not allowed access to this page.</h1>
+    {% endif %}
+    {% if user.id == user_id %}
+        <a class="btn btn-outline-secondary" href="{% url 'profile' %}">Back</a>
+    {% else %}
+        <a class="btn btn-outline-secondary" href="{% url 'user-detail' object.id %}">Back</a>
+    {% endif %}
+{% endblock content %}

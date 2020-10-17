@@ -1,0 +1,73 @@
+{% extends "drinks/base.html" %}
+{% load crispy_forms_tags %}
+{% load drinks_extras %}
+
+{% block content %}
+    <h2 class="mb-4">List of Ingredients</h2>
+    <div class="content-section">
+        <form method="get">
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">
+                    Search Ingredients
+                    <a class="float-right" href="{% url 'ingredient-create' %}">Add Ingredient</a>
+                </legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+    {% if page_obj %}
+        {% for ingredient in page_obj %}
+            <article class="media content-section">
+                <div class="media-body">
+                    <div class="article-metadata">
+                        <text class="text-muted">
+                            {% if ingredient.Alcohol %}
+                                Contains Alcohol
+                            {% else %}
+                                Alcohol-Free
+                            {% endif %}
+                        </text>
+                        {% if user.is_superuser %}
+                            <div class="float-right">
+                                <a class="ml-1" href="{% url 'ingredient-update' ingredient.id %}">Update</a>
+                                <a class="ml-1" href="{% url 'ingredient-delete' ingredient.id %}">Delete</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <h2 class="mt-2">
+                        <a class="article-title" href="{% url 'ingredient-detail' ingredient.id %}">{{ ingredient.Name }}</a>
+                    </h2>
+                </div>
+            </article>
+        {% endfor %}
+
+        {% if is_paginated %}
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-primary mb-4" href="{% search_url 1 'page' request.GET.urlencode %}">First</a>
+                <a class="btn btn-outline-primary mb-4" href="{% search_url page_obj.previous_page_number 'page' request.GET.urlencode %}">Previous</a>
+            {% endif %}
+
+            {% for number in page_obj.paginator.page_range %}
+                {% if page_obj.number == number %}
+                    <a class="btn btn-primary mb-4" href="{% search_url number 'page' request.GET.urlencode %}">{{ number }}</a>
+                {% elif page_obj.number|add:'-3' < number and number < page_obj.number|add:'3' %}
+                    <a class="btn btn-outline-primary mb-4" href="{% search_url number 'page' request.GET.urlencode %}">{{ number }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-primary mb-4" href="{% search_url page_obj.next_page_number 'page' request.GET.urlencode %}">Next</a>
+                <a class="btn btn-outline-primary mb-4" href="{% search_url page_obj.paginator.num_pages 'page' request.GET.urlencode %}">Last</a>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        {% if not page_obj %}
+            <h1 class="mb-4 mt-2">None of the ingredients met your search criteria.</h1>
+        {% else %}
+            <h1 class="mb-4 mt-2">There are no ingredients posted at this time.</h1>
+        {% endif %}
+    {% endif %}
+{% endblock content %}

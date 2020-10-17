@@ -1,0 +1,31 @@
+{% extends "drinks/base.html" %}
+
+{% block content %}
+    {% if ingredient %}
+        <article class="media content-section">
+            <div class="media-body">
+                <div class="article-metadata">
+                    <text class="text-muted">
+                        {% if ingredient.Alcohol %}
+                            Contains Alcohol
+                        {% else %}
+                            Alcohol-Free
+                        {% endif %}
+                    </text>
+                    {% if user.is_superuser %}
+                        <div class="float-right">
+                            <a class="ml-1" href="{% url 'ingredient-update' ingredient.id %}">Update</a>
+                            <a class="ml-1" href="{% url 'ingredient-delete' ingredient.id %}">Delete</a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="media-body">
+                    <h2>{{ ingredient.Name }}</h2>
+                </div>
+            </div>
+        </article>
+    {% else %}
+        <h1>The ingredient you are looking for does not exist.</h1>
+    {% endif %}
+    <a class="btn btn-outline-secondary" href="{% url 'ingredients-list' %}">Back</a>
+{% endblock content %}

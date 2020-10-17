@@ -1,0 +1,81 @@
+{% extends "drinks/base.html" %}
+{% load crispy_forms_tags %}
+{% load drinks_extras %}
+
+{% block content %}
+    <h2 class="mb-4">List of Users</h2>
+    <div class="content-section">
+        <form method="get">
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Search Users</legend>
+                {{ form|crispy }}
+            </fieldset>
+            <div class="form-group">
+                <button class="btn btn-outline-primary" type="submit">Search</button>
+            </div>
+        </form>
+    </div>
+    {% if page_obj %}
+        {% for user_profile in page_obj %}
+            <article class="media content-section">
+                <div class="media-body">
+                    <div class="article-metadata">
+                        <text class="mr-2">
+                            {% if not user_profile.is_active %}
+                                Deleted
+                            {% elif user_profile.is_superuser %}
+                                Administrator
+                            {% elif user_profile.is_staff %}
+                                Staff
+                            {% else %}
+                                User
+                            {% endif %}
+                        </text>
+                        {% if user.is_superuser and user_profile.is_active and not user.id == user_profile.id %}
+                            <div class="float-right">
+                                <a class="ml-1" href="{% url 'user-delete' user_profile.id %}">Delete</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="media mt-3">
+                        <img class="rounded-circle account-img" src="{{ user_profile.profile.image.url }}">
+                        <div class="media-body">
+                            <h2 class="account-heading">
+                                <a class="article-title" href="{% url 'user-detail' user_profile.id %}">
+                                    {{ user_profile.username }}
+                                </a>
+                            </h2>
+                            <p class="text-secondary">{{ user_profile.email }}</p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+
+        {% if is_paginated %}
+            {% if page_obj.has_previous %}
+                <a class="btn btn-outline-primary mb-4" href="{% search_url 1 'page' request.GET.urlencode %}">First</a>
+                <a class="btn btn-outline-primary mb-4" href="{% search_url page_obj.previous_page_number 'page' request.GET.urlencode %}">Previous</a>
+            {% endif %}
+
+            {% for number in page_obj.paginator.page_range %}
+                {% if page_obj.number == number %}
+                    <a class="btn btn-primary mb-4" href="{% search_url number 'page' request.GET.urlencode %}">{{ number }}</a>
+                {% elif page_obj.number|add:'-3' < number and number < page_obj.number|add:'3' %}
+                    <a class="btn btn-outline-primary mb-4" href="{% search_url number 'page' request.GET.urlencode %}">{{ number }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+                <a class="btn btn-outline-primary mb-4" href="{% search_url page_obj.next_page_number 'page' request.GET.urlencode %}">Next</a>
+                <a class="btn btn-outline-primary mb-4" href="{% search_url page_obj.paginator.num_pages 'page' request.GET.urlencode %}">Last</a>
+            {% endif %}
+        {% endif %}
+    {% else %}
+        {% if not page_obj %}
+            <h1 class="mb-4 mt-2">None of the users met your search criteria.</h1>
+        {% else %}
+            <h1 class="mb-4 mt-2">There are no users posted at this time.</h1>
+        {% endif %}
+    {% endif %}
+{% endblock content %}
